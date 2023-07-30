@@ -37,7 +37,7 @@ export default defineConfig({
               .toString()
               .split("node_modules/")[1]
               .split("/")[0]
-              .toString();
+              .toString(); 
           }
         },
         chunkFileNames: "js/[name].[hash].js", // 用于命名代码拆分时创建的共享块的输出命名，[name]表示文件名,[hash]表示该文件内容hash值
