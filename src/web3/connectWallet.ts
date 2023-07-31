@@ -1,4 +1,3 @@
-import { promises } from 'dns';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 
@@ -17,6 +16,7 @@ const Bsc_CHAIN_ID_DECIMAL = '56';// BSC网络的链ID 10进制
 
 // BNB合约地址
 const ContractAddress = '0x55d398326f99059fF775485246999027B3197955';//BNB子代币USDT合约地址
+// const ContractAddress = '0x8c6721d8b77f38ada051e0aa4d492f9796dc2d8a';//BNB子代币USDT001合约地址
 
 // ERC20合约ABI（仅包含transfer函数）
 const erc20Abi: AbiItem[] = [
@@ -234,8 +234,8 @@ async function connectWallet() { // 连接钱包
         }
     };
 
-    let balance = 0;// 账户余额
-    let balanceChain = "0";
+    let balance;// 账户余额
+    let balanceChain;
     try {
         const tokenContract = new web3.eth.Contract(erc20Abi, ContractAddress); // 初始化合约
         balance = await tokenContract.methods.balanceOf(address).call()  // 获取账户余额

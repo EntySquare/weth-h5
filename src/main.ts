@@ -10,9 +10,12 @@ import router from './router/index'
 import plugin from "./components/index";
 // 导入 pinia
 import { createPinia } from 'pinia'
+
 let pinia = createPinia()
 
-createApp(App).use(router)
+const app = createApp(App)
+
+app.use(router)
     .use(router)
     .use(pinia)
     .use(plugin)
