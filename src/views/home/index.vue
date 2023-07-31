@@ -2,10 +2,18 @@
 import * as echarts from 'echarts';
 import useHomeStore from '@/store/modules/home' //* 导入store
 import { storeToRefs } from 'pinia' //* 导入storeToRefs
-import { nextTick } from 'vue';
+import { nextTick, ref } from 'vue';
 const state = useHomeStore() //* 获取store
 const { formatBalance } = state //* 获取store中的方法
 let { Account, Balance, isLoading } = storeToRefs(state)//* 获取store中的变量
+const btn1 = ref(false)
+const btn2 = ref(false)
+const mouseupFun = () => {
+  setTimeout(() => {
+    btn1.value = false
+    btn2.value = false
+  }, 100);
+}
 var chartDom;
 nextTick(() => {
   chartDom = document.getElementById('main')!;
@@ -35,7 +43,7 @@ nextTick(() => {
   <div class="home_view">
     <div class="container">
       <div class="echarts" id="main"></div>
-      <div class="btn">
+      <div class="btn" :style="{ opacity: btn1 ? 0.8 : 1 }" @mousedown="btn1 = true" @mouseup="mouseupFun">
         K线走势详情
       </div>
       <div class="title">
@@ -81,7 +89,8 @@ nextTick(() => {
         <div class="left">滑点 2.0% <i>!</i></div>
         <div class="right">{{ 0 }} HTT</div>
       </div>
-      <div class="btn" style=" margin: 36px 0;">
+      <div class="btn" :style="{ margin: '36px 0', opacity: btn2 ? 0.8 : 1 }" @mousedown="btn2 = true"
+        @mouseup="mouseupFun">
         确认
       </div>
     </div>
@@ -90,8 +99,7 @@ nextTick(() => {
 <style scoped lang='less'>
 .home_view {
   width: 100%;
-  background: #e8f5e9;
-  // color: #673ab7;
+  background: #E8F5E9;
 
   .echarts {
     height: 60vh;
@@ -144,7 +152,7 @@ nextTick(() => {
 
       .text1 {
         padding: 6px 10px;
-        background: #ebf4fe;
+        background: #DDECFE;
         color: #82a1dd;
         border-radius: 8px;
         font-size: .8rem;
@@ -250,7 +258,7 @@ nextTick(() => {
     max-width: 300px;
     width: 100vw;
     height: 40px;
-    background: linear-gradient(270deg, #6731b89e 0%, #673ab7 100%);
+    background: linear-gradient(200deg, #6731B84C 0%, #673ab7 100%);
     color: #fff;
     text-align: center;
     line-height: 40px;
