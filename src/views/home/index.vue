@@ -19,7 +19,7 @@ nextTick(() => {
   chartDom = document.getElementById('main')!;
   var myChart = echarts.init(chartDom);
   type EChartsOption = echarts.EChartsOption;
-  var option: EChartsOption;
+  var option: { yAxis: { type: string }; xAxis: { data: string[]; type: string }; series: { data: number[]; type: string }[] };
   option = {
     xAxis: {
       type: 'category',
@@ -50,13 +50,13 @@ nextTick(() => {
         <div class="img">
           <img src="" alt="">
           <div class="img_text">
-            USDT
+            WETH
           </div>
         </div>
         <div class="text">支付</div>
         <div class="flex_one">
           <div class="content">
-            钱包资产: {{ formatBalance(Balance + '') }}
+            钱包资产: {{ Balance }}
           </div>
         </div>
       </div>
@@ -72,13 +72,13 @@ nextTick(() => {
         <div class="img">
           <img src="" alt="">
           <div class="img_text">
-            HTT
+            WETC
           </div>
         </div>
         <div class="text1">接收</div>
         <div class="flex_one">
           <div class="content">
-            可使用配额: {{ formatBalance(Balance + '') }}
+            可使用配额: {{ Balance }}
           </div>
         </div>
       </div>
@@ -86,8 +86,7 @@ nextTick(() => {
         <input type="text">
       </div>
       <div class="massage">
-        <div class="left">滑点 2.0% <i>!</i></div>
-        <div class="right">{{ 0 }} HTT</div>
+        <div class="right">{{ 0 }} WETC</div>
       </div>
       <div class="btn" :style="{ margin: '36px 0', opacity: btn2 ? 0.8 : 1 }" @mousedown="btn2 = true"
         @mouseup="mouseupFun">
