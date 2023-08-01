@@ -15,8 +15,8 @@ const Bsc_CHAIN_ID_DECIMAL = '56';// BSC网络的链ID 10进制
 
 
 // BNB合约地址
-const ContractAddress = '0x55d398326f99059fF775485246999027B3197955';//BNB子代币USDT合约地址
-// const ContractAddress = '0x8c6721d8b77f38ada051e0aa4d492f9796dc2d8a';//BNB子代币USDT001合约地址
+const WETHContractAddress = '0x9d0307Ffa462A475417B801F46FAe459b1608888';//BNB子代币USDT合约地址
+const WETCContractAddress = '0xc3D135dc5e8705f01abBcAb21F3bd3609241b547\n';//BNB子代币USDT001合约地址
 
 // ERC20合约ABI（仅包含transfer函数）
 const erc20Abi: AbiItem[] = [

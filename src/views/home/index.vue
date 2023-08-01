@@ -129,8 +129,7 @@ const setRevese = () => {
         </div>
       </div>
       <div class="massage">
-        <div class="left">滑点 2.0% <i>!</i></div>
-        <div class="right">{{ 0 }} HTT</div>
+        <div class="right">{{ 0 }} WETC</div>
       </div>
       <div class="btn" :style="{ margin: '36px 0', opacity: btn2 ? 0.8 : 1 }" @mousedown="btn2 = true"
         @mouseup="mouseupFun">
