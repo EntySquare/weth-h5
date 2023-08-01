@@ -103,8 +103,8 @@ const setRevese = () => {
             <input type="text" v-model="weth" placeholder="0">
           </div>
         </div>
-        <div @click="setRevese" class="loop">
-          <div class="body">
+        <div class="loop">
+          <div @click="setRevese" class="body">
             <img src="@/assets/images/loop.svg" alt="" srcset="">
           </div>
         </div>
