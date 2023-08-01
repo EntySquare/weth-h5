@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import connectWallet from "@/web3/connectWallet";
 import { ElMessage } from 'element-plus'
 
+
 let useHomeStore = defineStore('home', {
   state: () => ({
     Account: '', //* 当前账户
@@ -19,7 +20,7 @@ let useHomeStore = defineStore('home', {
         try {
           await connectWallet().then((C: any) => {
             this.Account = C.address; //* 当前账户
-            this.Balance = this.formatBalance(C.balance); //* 当前余额
+            this.Balance = C.balance; //* 当前余额
             this.ToSignfunc = C.dataToSignfunc //* 签名方法
             this.transferUSDT = C.transferUSDT; //* 赋值转账方法
             console.log('C:', C)
@@ -39,10 +40,28 @@ let useHomeStore = defineStore('home', {
     transferUSDT(recipient: string, amount: number, hash: (hash: string) => void, verifyFC: () => void, err: () => void) { },
     //* 格式化金额
     formatBalance(balance: string) {
+      if (+balance === 0) {
+        return "0.00";
+      }
       balance = balance.split("").reverse().join(""); //* 将字符串倒序
-      balance = balance.slice(0, 18) + "." + balance.slice(18); //* 在第18位后面插入小数点
+      //* 字符串长度大于18，说明有小数点
+      if (balance.length > 18) {
+        // 添加小数点
+        balance = balance.slice(0, 18) + "." + balance.slice(18);
+      } else {
+        let zero = 18 - balance.length;
+        for (let i = 0; i < zero; i++) {
+          balance += "0";
+        }
+        balance = balance.slice(0, 18) + "." + '0';
+      }
       balance = balance.split("").reverse().join(""); //* 将字符串倒序
-      balance = parseFloat(balance).toFixed(2); //* 保留两位小数
+      if (balance.length > 18) {
+        //* 去掉小数点后两位再往后的所有字符
+        balance = balance.split('.')[0] + '.' + balance.split('.')[1].slice(0, 2);
+      } else if (balance.length === 18) {
+        balance = "0" + balance;
+      }
       return balance
     },
   },

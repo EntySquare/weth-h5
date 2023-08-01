@@ -4,10 +4,13 @@ import useHomeStore from '@/store/modules/home' //* 导入store
 import { storeToRefs } from 'pinia' //* 导入storeToRefs
 import { nextTick, ref } from 'vue';
 const state = useHomeStore() //* 获取store
+import { ElMessage } from 'element-plus'
 const { formatBalance } = state //* 获取store中的方法
 let { Account, Balance, isLoading } = storeToRefs(state)//* 获取store中的变量
+import axios from 'axios'
 const btn1 = ref(false)
 const btn2 = ref(false)
+const reverse = ref(false)
 const mouseupFun = () => {
   setTimeout(() => {
     btn1.value = false
@@ -15,29 +18,63 @@ const mouseupFun = () => {
   }, 100);
 }
 var chartDom;
-nextTick(() => {
+type EChartsOption = echarts.EChartsOption;
+var option = ref<EChartsOption>();
+const getEchartsData = async () => {
+  try {
+    const { data } = await axios.get('http://104.194.79.218:9900/kline/get')
+    let xData: any = [];
+    let yData: any = [];
+    data.data.map((item: any) => {
+      if (item.createTime.split(' ')[1].slice(0, 2) === '00') {
+        let day = item.createTime.split(' ')[0].split('-')
+        xData.push(day[1] + '-' + day[2])
+      } else {
+        xData.push(item.createTime.split(' ')[0].split('-')[2] + '/' + item.createTime.split(' ')[1].slice(0, 2) + ':00')
+      }
+      yData.push(item.nowPrice)
+    })
+    option.value = {
+      title: [
+        {
+          left: 'center',
+          text: 'WETC价格'
+        },
+      ],
+      tooltip: {
+        trigger: 'axis'
+      },
+      xAxis: {
+        type: 'category',
+        data: xData
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          data: yData,
+          type: 'line'
+        }
+      ]
+    };
+  } catch (error) {
+    alert('请关闭代理网路')
+  }
+}
+nextTick(async () => {
   chartDom = document.getElementById('main')!;
   var myChart = echarts.init(chartDom);
-  type EChartsOption = echarts.EChartsOption;
-  var option: EChartsOption;
-  option = {
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [
-      {
-        data: [150, 230, 224, 218, 135, 147, 260],
-        type: 'line'
-      }
-    ]
-  };
-
-  option && myChart.setOption(option);
+  await getEchartsData()
+  option.value && myChart.setOption(option.value);
 })
+const weth = ref('')
+const wetc = ref('')
+const setRevese = () => {
+  reverse.value = !reverse.value
+  wetc.value = ''
+  weth.value = ''
+}
 </script>
 <template>
   <div class="home_view">
@@ -46,44 +83,50 @@ nextTick(() => {
       <div class="btn" :style="{ opacity: btn1 ? 0.8 : 1 }" @mousedown="btn1 = true" @mouseup="mouseupFun">
         K线走势详情
       </div>
-      <div class="title">
-        <div class="img">
-          <img src="" alt="">
-          <div class="img_text">
-            USDT
+      <div class="input_body" :style="{ flexDirection: reverse ? 'column-reverse' : 'column' }">
+        <div class="body_box">
+          <div class="title">
+            <div class="img">
+              <img src="" alt="">
+              <div class="img_text">
+                WETH
+              </div>
+            </div>
+            <div :class="[reverse ? 'text1' : 'text']">{{ reverse ? '接收' : '支付' }}</div>
+            <div class="flex_one">
+              <div class="content">
+                {{ reverse ? '可使用配额: ' : '钱包资产: ' }} {{ formatBalance(Balance + '') }}
+              </div>
+            </div>
+          </div>
+          <div class="input">
+            <input type="text" v-model="weth" placeholder="0">
           </div>
         </div>
-        <div class="text">支付</div>
-        <div class="flex_one">
-          <div class="content">
-            钱包资产: {{ formatBalance(Balance + '') }}
+        <div @click="setRevese" class="loop">
+          <div class="body">
+            <img src="@/assets/images/loop.svg" alt="" srcset="">
           </div>
         </div>
-      </div>
-      <div class="input">
-        <input type="text">
-      </div>
-      <div class="loop">
-        <div class="body">
-          <img src="@/assets/images/loop.svg" alt="" srcset="">
-        </div>
-      </div>
-      <div class="title">
-        <div class="img">
-          <img src="" alt="">
-          <div class="img_text">
-            HTT
+        <div class="body_box">
+          <div class="title">
+            <div class="img">
+              <img src="" alt="">
+              <div class="img_text">
+                WETC
+              </div>
+            </div>
+            <div :class="[!reverse ? 'text1' : 'text']">{{ !reverse ? '接收' : '支付' }}</div>
+            <div class="flex_one">
+              <div class="content">
+                {{ !reverse ? '可使用配额: ' : '钱包资产: ' }} {{ formatBalance(Balance + '') }}
+              </div>
+            </div>
+          </div>
+          <div class="input">
+            <input type="text" v-model="wetc" placeholder="0">
           </div>
         </div>
-        <div class="text1">接收</div>
-        <div class="flex_one">
-          <div class="content">
-            可使用配额: {{ formatBalance(Balance + '') }}
-          </div>
-        </div>
-      </div>
-      <div class="input">
-        <input type="text">
       </div>
       <div class="massage">
         <div class="left">滑点 2.0% <i>!</i></div>
@@ -114,11 +157,23 @@ nextTick(() => {
   .container {
     width: 100%;
     height: 100%;
-    padding: 0 16px 40px;
+    padding: 20px 16px 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    .input_body {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: center;
+
+      .body_box {
+        width: 100%;
+      }
+    }
 
     .title {
       margin: 16px 0;
