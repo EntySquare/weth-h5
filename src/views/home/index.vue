@@ -10,11 +10,13 @@ let { Account, Balance, isLoading } = storeToRefs(state)//* 获取store中的变
 import axios from 'axios'
 const btn1 = ref(false)
 const btn2 = ref(false)
+const loop = ref(false)
 const reverse = ref(false)
 const mouseupFun = () => {
   setTimeout(() => {
     btn1.value = false
     btn2.value = false
+    loop.value = false
   }, 100);
 }
 var chartDom;
@@ -71,6 +73,7 @@ nextTick(async () => {
 const weth = ref('')
 const wetc = ref('')
 const setRevese = () => {
+  loop.value = true
   reverse.value = !reverse.value
   wetc.value = ''
   weth.value = ''
@@ -104,7 +107,8 @@ const setRevese = () => {
           </div>
         </div>
         <div class="loop">
-          <div @click="setRevese" class="body">
+          <div @click="setRevese" :style="{ opacity: loop ? 0.8 : 1 }" @mousedown="loop = true" @mouseup="mouseupFun"
+            class="body">
             <img src="@/assets/images/loop.svg" alt="" srcset="">
           </div>
         </div>
