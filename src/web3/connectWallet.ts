@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import {login } from '@/api/user'
-import {getToken,setToken} from "@/utils/auth"; //*获取计划列表
+import { login } from '@/api/user'
+import { getToken, setToken } from "@/utils/auth"; //*获取计划列表
 declare global { // 声明全局变量
     interface Window { // 声明window全局变量
         ethereum: any; // 声明ethereum全局变量
@@ -17,7 +17,7 @@ const Bsc_CHAIN_ID_DECIMAL = '56';// BSC网络的链ID 10进制
 
 // BNB合约地址
 const WETHContractAddress = '0x9d0307Ffa462A475417B801F46FAe459b1608888';//BNB子代币USDT合约地址
-const WETCContractAddress = '0xc3D135dc5e8705f01abBcAb21F3bd3609241b547\n';//BNB子代币USDT001合约地址
+const WETCContractAddress = '0xc3D135dc5e8705f01abBcAb21F3bd3609241b547';//BNB子代币USDT001合约地址
 
 // ERC20合约ABI（仅包含transfer函数）
 const erc20Abi: AbiItem[] = [
@@ -144,7 +144,7 @@ async function connectWallet() { // 连接钱包
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' }); // 获取账户
 
     const address = accounts[0]; // 获取账户地址
-    const resLogin = await login({address:address,token:getToken()}) //*
+    const resLogin = await login({ address: address, token: getToken() }) //*
     const dataToSignfunc = async () => { // 请求MetaMask签名数据
         const cTimestamp = Math.floor(Date.now()).toString();
         const msg = '登录签名_7B_SWAP_' + cTimestamp; // 待签名的数据
@@ -253,7 +253,7 @@ async function connectWallet() { // 连接钱包
 
     }
     console.log('连接成功.....................')
-    return { web3, address, balance,cBalance, balanceChain, transferUSDT, dataToSignfunc }; // 返回web3、账户地址、账户余额、转账函数
+    return { web3, address, balance, cBalance, balanceChain, transferUSDT, dataToSignfunc }; // 返回web3、账户地址、账户余额、转账函数
 }
 
 export default connectWallet;

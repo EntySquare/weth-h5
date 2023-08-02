@@ -20,12 +20,13 @@ const mouseupFun = () => {
     loop.value = false
   }, 100);
 }
+const currentPrice = ref('')
 var chartDom;
 type EChartsOption = echarts.EChartsOption;
 var option = ref<EChartsOption>();
 const getEchartsData = async () => {
   try {
-    const { data } = await axios.get('http://104.194.79.218:9900/kline/get')
+    const { data } = await axios.get('https://price.wethswap.cc/kline/get')
     let xData: any = [];
     let yData: any = [];
     data.data.map((item: any) => {
@@ -37,6 +38,7 @@ const getEchartsData = async () => {
       }
       yData.push(item.nowPrice)
     })
+    currentPrice.value = yData[yData.length - 1]
     option.value = {
       title: [
         {
@@ -92,7 +94,7 @@ const setRevese = () => {
       </div>
       <div class="echarts" id="main"></div>
       <div class="btn" :style="{ opacity: btn1 ? 0.8 : 1 }" @mousedown="btn1 = true" @mouseup="mouseupFun">
-        K线走势详情
+        K线走势详情{{ currentPrice }}
       </div>
       <div class="input_body" :style="{ flexDirection: reverse ? 'column-reverse' : 'column' }">
         <div class="body_box">
@@ -111,7 +113,7 @@ const setRevese = () => {
             </div>
           </div>
           <div class="input">
-            <input type="text" v-model="weth" placeholder="0">
+            <input type="text" :disabled="reverse" v-model="weth" :placeholder="`${+wetc * +currentPrice}`">
           </div>
         </div>
         <div class="loop">
@@ -136,7 +138,7 @@ const setRevese = () => {
             </div>
           </div>
           <div class="input">
-            <input type="text" v-model="wetc" placeholder="0">
+            <input type="text" :disabled="!reverse" v-model="wetc" :placeholder="`${+weth / +currentPrice}`">
           </div>
         </div>
       </div>
