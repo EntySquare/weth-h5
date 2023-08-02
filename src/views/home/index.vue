@@ -1,11 +1,12 @@
 <script setup lang='ts' name="HomeView">
 import * as echarts from 'echarts';
+import Loading from "vue-loading-overlay"; // 导入加载组件
 import useHomeStore from '@/store/modules/home' //* 导入store
 import { storeToRefs } from 'pinia' //* 导入storeToRefs
 import { nextTick, ref } from 'vue';
 const state = useHomeStore() //* 获取store
 import { ElMessage } from 'element-plus'
-const { formatBalance } = state //* 获取store中的方法
+const { formatBalance, replaceStr } = state //* 获取store中的方法
 let { Account, Balance, isLoading } = storeToRefs(state)//* 获取store中的变量
 import axios from 'axios'
 const btn1 = ref(false)
@@ -61,7 +62,7 @@ const getEchartsData = async () => {
       ]
     };
   } catch (error) {
-    alert('请关闭代理网路')
+    // alert('请关闭代理网路')
   }
 }
 nextTick(async () => {
@@ -82,6 +83,13 @@ const setRevese = () => {
 <template>
   <div class="home_view">
     <div class="container">
+      <div class="top_address">
+
+        <loading v-if="Account == ''" :height="20.59" :width="20.59" transition="none" color="#673ab7"
+          :active="isLoading">
+        </loading>
+        <span v-else>{{ Account != '' ? replaceStr(Account) : '连接钱包' }}</span>
+      </div>
       <div class="echarts" id="main"></div>
       <div class="btn" :style="{ opacity: btn1 ? 0.8 : 1 }" @mousedown="btn1 = true" @mouseup="mouseupFun">
         K线走势详情
@@ -165,6 +173,25 @@ const setRevese = () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    .top_address {
+      height: 3rem;
+      width: 100%;
+      font-size: 1.2rem;
+      color: #673ab7;
+      display: flex;
+      justify-content: end;
+      align-items: center;
+      padding: 0 10px;
+
+      span {
+        background: #82A0DD7A;
+        display: flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 20px;
+      }
+    }
 
     .input_body {
       width: 100%;

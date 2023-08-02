@@ -8,7 +8,7 @@ let useHomeStore = defineStore('home', {
   state: () => ({
     Account: '', //* 当前账户
     Balance: 0, //* 当前余额
-    CBalance:0,
+    CBalance: 0,
     isLoading: false, //* 连接加载状态
   }),
   actions: {
@@ -30,7 +30,7 @@ let useHomeStore = defineStore('home', {
             resolve(C); //返回数据
           })
         } catch (error) {
-          this.isLoading = false;
+          // this.isLoading = false;
           reject(error); //返回错误
           console.log('error:', error)
         }
@@ -40,6 +40,11 @@ let useHomeStore = defineStore('home', {
     ToSignfunc(): any { },
     //* 被C 赋值的转账方法，用于后续调用
     transferUSDT(recipient: string, amount: number, hash: (hash: string) => void, verifyFC: () => void, err: () => void) { },
+    //* 格式化地址
+    replaceStr(str: string) {
+      if (str == undefined) return ''
+      return str.substring(0, 6) + '...' + str.substring(38)
+    },
     //* 格式化金额
     formatBalance(balance: string) {
       if (+balance === 0) {
