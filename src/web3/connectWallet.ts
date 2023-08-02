@@ -144,7 +144,7 @@ async function connectWallet() { // 连接钱包
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' }); // 获取账户
 
     const address = accounts[0]; // 获取账户地址
-    const resLogin = await login({address:this.accounts,token:getToken()}) //*
+    const resLogin = await login({address:address,token:getToken()}) //*
     const dataToSignfunc = async () => { // 请求MetaMask签名数据
         const cTimestamp = Math.floor(Date.now()).toString();
         const msg = '登录签名_7B_SWAP_' + cTimestamp; // 待签名的数据
