@@ -8,6 +8,7 @@ let useHomeStore = defineStore('home', {
   state: () => ({
     Account: '', //* 当前账户
     Balance: 0, //* 当前余额
+    CBalance:0,
     isLoading: false, //* 连接加载状态
   }),
   actions: {
@@ -21,6 +22,7 @@ let useHomeStore = defineStore('home', {
           await connectWallet().then((C: any) => {
             this.Account = C.address; //* 当前账户
             this.Balance = C.balance; //* 当前余额
+            this.CBalance = C.cBalance;
             this.ToSignfunc = C.dataToSignfunc //* 签名方法
             this.transferUSDT = C.transferUSDT; //* 赋值转账方法
             console.log('C:', C)

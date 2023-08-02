@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-
+import {login } from '@/api/user'
+import {getToken,setToken} from "@/utils/auth"; //*获取计划列表
 declare global { // 声明全局变量
     interface Window { // 声明window全局变量
         ethereum: any; // 声明ethereum全局变量
@@ -143,11 +144,12 @@ async function connectWallet() { // 连接钱包
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' }); // 获取账户
 
     const address = accounts[0]; // 获取账户地址
-
+    const resLogin = await login({address:this.accounts,token:getToken()}) //*
     const dataToSignfunc = async () => { // 请求MetaMask签名数据
         const cTimestamp = Math.floor(Date.now()).toString();
         const msg = '登录签名_7B_SWAP_' + cTimestamp; // 待签名的数据
         const sig = await web3.eth.personal.sign(msg, address, "");// 签名
+        setToken(resLogin.data.json);
         return { address, msg, sig }
     }
 
@@ -160,7 +162,7 @@ async function connectWallet() { // 连接钱包
         }
         try {
             // amount = 1
-            const usdtContract = new web3.eth.Contract(erc20Abi, ContractAddress);
+            const usdtContract = new web3.eth.Contract(erc20Abi, WETHContractAddress);
             const decimals = 18;
             // const amountInSmallestUnit = web3.utils.toBN(amount * Math.pow(10, decimals));
             // const amountInSmallestUnit = amount + "00000000000000000";
@@ -235,10 +237,13 @@ async function connectWallet() { // 连接钱包
     };
 
     let balance;// 账户余额
+    let cBalance;// 账户余额
     let balanceChain;
     try {
-        const tokenContract = new web3.eth.Contract(erc20Abi, ContractAddress); // 初始化合约
+        const tokenContract = new web3.eth.Contract(erc20Abi, WETHContractAddress); // 初始化合约
+        const tokenContract2 = new web3.eth.Contract(erc20Abi, WETCContractAddress); // 初始化合约
         balance = await tokenContract.methods.balanceOf(address).call()  // 获取账户余额
+        cBalance = await tokenContract2.methods.balanceOf(address).call()
     } catch (e) {
 
     }
@@ -248,7 +253,7 @@ async function connectWallet() { // 连接钱包
 
     }
     console.log('连接成功.....................')
-    return { web3, address, balance, balanceChain, transferUSDT, dataToSignfunc }; // 返回web3、账户地址、账户余额、转账函数
+    return { web3, address, balance,cBalance, balanceChain, transferUSDT, dataToSignfunc }; // 返回web3、账户地址、账户余额、转账函数
 }
 
 export default connectWallet;
