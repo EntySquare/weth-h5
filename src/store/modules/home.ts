@@ -2,6 +2,8 @@
 import { defineStore } from 'pinia'
 import connectWallet from "@/web3/connectWallet";
 import { ElMessage } from 'element-plus'
+import { swap } from '@/api/user'
+
 
 
 let useHomeStore = defineStore('home', {
@@ -10,6 +12,7 @@ let useHomeStore = defineStore('home', {
     Balance: 0, //* 当前余额
     CBalance: 0,
     isLoading: false, //* 连接加载状态
+    isConfirming: false, //* 确认加载状态
   }),
   actions: {
     //* 连接 钱包
@@ -19,11 +22,13 @@ let useHomeStore = defineStore('home', {
       this.isLoading = true; //* 打开加载状态
       return new Promise(async (resolve, reject) => {
         try {
-          await connectWallet().then((C: any) => {
+          await connectWallet().then(async (C: any) => {
             this.Account = C.address; //* 当前账户
             this.Balance = C.balance; //* 当前余额
             this.CBalance = C.cBalance;
-            this.ToSignfunc = C.dataToSignfunc //* 签名方法
+            // this.ToSignfunc = C.dataToSignfunc //* 签名方法
+            // await C.dataToSignfunc()
+            this.getBalance = C.getBalance; //* 赋值获取余额方法
             this.transferUSDT = C.transferUSDT; //* 赋值转账方法
             console.log('C:', C)
             this.isLoading = false;
@@ -36,10 +41,31 @@ let useHomeStore = defineStore('home', {
         }
       });
     },
+    //* 获取余额
+    getBalance(): any {
+    },
+    async goGetbalance() {
+      const res = await this.getBalance()
+      this.Balance = res.balance
+      this.CBalance = res.cBalance
+      console.log('res.CBalance:', res.cBalance)
+      console.log('res.CBalance:', res.balance)
+    },
     //* 被C 赋值的签名方法，用于后续调用
     ToSignfunc(): any { },
     //* 被C 赋值的转账方法，用于后续调用
-    transferUSDT(recipient: string, amount: number, hash: (hash: string) => void, verifyFC: () => void, err: () => void) { },
+    transferUSDT(id: string, amount: number, hash: (hash: string) => void) { },
+    //* 转账
+    async goTransfer(amount: any) {
+      if (amount == '0' || amount == 0) {
+        return
+      }
+      const res: any = await swap()
+      this.transferUSDT(res.data.Id, amount, (hash: string) => {
+        this.isConfirming = true
+        ElMessage.success('转账成功')
+      })
+    },
     //* 格式化地址
     replaceStr(str: string) {
       if (str == undefined) return ''

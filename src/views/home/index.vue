@@ -6,13 +6,13 @@ import { storeToRefs } from 'pinia' //* 导入storeToRefs
 import { nextTick, ref } from 'vue';
 const state = useHomeStore() //* 获取store
 import { ElMessage } from 'element-plus'
-const { formatBalance, replaceStr } = state //* 获取store中的方法
-let { Account, Balance, isLoading } = storeToRefs(state)//* 获取store中的变量
+const { formatBalance, replaceStr, goTransfer, goGetbalance } = state //* 获取store中的方法
+let { Account, Balance, isLoading, isConfirming, CBalance } = storeToRefs(state)//* 获取store中的变量
 import axios from 'axios'
 const btn1 = ref(false)
 const btn2 = ref(false)
 const loop = ref(false)
-const reverse = ref(false)
+const reverse = ref(true)
 const mouseupFun = () => {
   setTimeout(() => {
     btn1.value = false
@@ -84,17 +84,22 @@ const setRevese = () => {
 </script>
 <template>
   <div class="home_view">
+    <div class="poop" v-if="isConfirming">
+      <loading :height="30.59" :width="30.59" transition="none" color="#ffffff" :active="true">
+      </loading>
+      <span>交易确认中,请勿刷新...</span>
+    </div>
     <div class="container">
       <div class="top_address">
-
         <loading v-if="Account == ''" :height="20.59" :width="20.59" transition="none" color="#673ab7"
           :active="isLoading">
         </loading>
         <span v-else>{{ Account != '' ? replaceStr(Account) : '连接钱包' }}</span>
       </div>
       <div class="echarts" id="main"></div>
-      <div class="btn" :style="{ opacity: btn1 ? 0.8 : 1 }" @mousedown="btn1 = true" @mouseup="mouseupFun">
-        K线走势详情{{ currentPrice }}
+      <div class="btn" :style="{ opacity: btn1 ? 0.8 : 1 }" @mousedown="btn1 = true" @mouseup="mouseupFun"
+        @click="goGetbalance">
+        K线走势详情
       </div>
       <div class="input_body" :style="{ flexDirection: reverse ? 'column-reverse' : 'column' }">
         <div class="body_box">
@@ -116,12 +121,12 @@ const setRevese = () => {
             <input type="text" :disabled="reverse" v-model="weth" :placeholder="`${+wetc * +currentPrice}`">
           </div>
         </div>
-        <div class="loop">
+        <!-- <div class="loop">
           <div @click="setRevese" :style="{ opacity: loop ? 0.8 : 1 }" @mousedown="loop = true" @mouseup="mouseupFun"
             class="body">
             <img src="@/assets/images/loop.svg" alt="" srcset="">
           </div>
-        </div>
+        </div> -->
         <div class="body_box">
           <div class="title">
             <div class="img">
@@ -133,12 +138,12 @@ const setRevese = () => {
             <div :class="[!reverse ? 'text1' : 'text']">{{ !reverse ? '接收' : '支付' }}</div>
             <div class="flex_one">
               <div class="content">
-                {{ !reverse ? '可使用配额: ' : '钱包资产: ' }} {{ formatBalance(Balance + '') }}
+                {{ !reverse ? '可使用配额: ' : '钱包资产: ' }} {{ formatBalance(CBalance + '') }}
               </div>
             </div>
           </div>
           <div class="input">
-            <input type="text" :disabled="!reverse" v-model="wetc" :placeholder="`${+weth / +currentPrice}`">
+            <input type="text" :disabled="!reverse" v-model="wetc" placeholder="请输入">
           </div>
         </div>
       </div>
@@ -146,7 +151,7 @@ const setRevese = () => {
         <div class="right">{{ 0 }} WETC</div>
       </div>
       <div class="btn" :style="{ margin: '36px 0', opacity: btn2 ? 0.8 : 1 }" @mousedown="btn2 = true"
-        @mouseup="mouseupFun">
+        @mouseup="mouseupFun" @click="goTransfer(wetc)">
         确认
       </div>
     </div>
@@ -154,6 +159,7 @@ const setRevese = () => {
 </template>
 <style scoped lang='less'>
 .home_view {
+  position: relative;
   width: 100%;
   background: #E8F5E9;
 
@@ -165,6 +171,21 @@ const setRevese = () => {
       width: 100vw !important;
       height: 100% !important;
     }
+  }
+
+  .poop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #00000096;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
   }
 
   .container {
@@ -201,6 +222,7 @@ const setRevese = () => {
       flex-direction: column;
       justify-content: start;
       align-items: center;
+      gap: 20px;
 
       .body_box {
         width: 100%;

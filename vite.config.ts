@@ -37,7 +37,7 @@ export default defineConfig({
               .toString()
               .split("node_modules/")[1]
               .split("/")[0]
-              .toString(); 
+              .toString();
           }
         },
         chunkFileNames: "js/[name].[hash].js", // 用于命名代码拆分时创建的共享块的输出命名，[name]表示文件名,[hash]表示该文件内容hash值
@@ -61,11 +61,12 @@ export default defineConfig({
     host: "0.0.0.0",
     proxy: {
       "/api": {
-        target: "", // 后台接口
+        target: "https://api.wethswap.cc", // 后台接口
         changeOrigin: true,
         secure: false, // 如果是https接口，需要配置这个参数
         ws: true, //websocket支持
         rewrite: (path) => path.replace(/^\/api/, ""), // 重写接口
+
       },
     },
   },
