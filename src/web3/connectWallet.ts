@@ -522,7 +522,7 @@ async function connectWallet() { // 连接钱包
                     const cTimestamp = Math.floor(Date.now() / 1000) + 600;
                     const transaction = usdtContract.methods
                         .swapWETH(id, amountInSmallestUnit.toString(), 0, cTimestamp * 1000)
-                        .send({ from: address, gasPrice: gasPrice, gas: "0x" + BigInt(100000).toString(16), })
+                        .send({ from: address, gasPrice: gasPrice })
 
                     transaction.on('transactionHash', function (hash: any) {
                         hashFC(hash); // 回调函数，处理交易哈希

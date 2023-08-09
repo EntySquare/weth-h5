@@ -20,7 +20,8 @@ const mouseupFun = () => {
     loop.value = false
   }, 100);
 }
-const currentPrice = ref('')
+const etcPrice = ref('')
+const ethPrice = ref('')
 var chartDom;
 type EChartsOption = echarts.EChartsOption;
 var option = ref<EChartsOption>();
@@ -38,7 +39,7 @@ const getEchartsData = async () => {
       }
       yData.push(item.nowPrice)
     })
-    currentPrice.value = yData[yData.length - 1]
+    etcPrice.value = yData[yData.length - 1]
     option.value = {
       title: [
         {
@@ -67,10 +68,20 @@ const getEchartsData = async () => {
     // alert('请关闭代理网路')
   }
 }
+const getEthPrice = async () => {
+  try {
+    const { data } = await axios.get('https://api.geckoterminal.com/api/v2/networks/bsc/tokens/0x9d0307Ffa462A475417B801F46FAe459b1608888/pools')
+    ethPrice.value = data.data[0].attributes.base_token_price_usd
+    console.log('ethPrice.value:', ethPrice.value)
+  } catch (error) {
+    // alert('请关闭代理网路')
+  }
+}
 nextTick(async () => {
   chartDom = document.getElementById('main')!;
   var myChart = echarts.init(chartDom);
   await getEchartsData()
+  await getEthPrice()
   option.value && myChart.setOption(option.value);
 })
 const weth = ref('')
@@ -118,7 +129,8 @@ const setRevese = () => {
             </div>
           </div>
           <div class="input">
-            <input type="text" :disabled="reverse" v-model="weth" :placeholder="`${+wetc * +currentPrice}`">
+            <input type="text" :disabled="reverse" v-model="weth" :placeholder="`${(+wetc / (+ethPrice / +etcPrice))}`">
+            <!-- {{ etcPrice }} {{ ethPrice }} -->
           </div>
         </div>
         <!-- <div class="loop">
